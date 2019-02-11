@@ -13,10 +13,10 @@ Nginx、Redmine、Gitbucket、あと必要なその他をそれぞれDockerコ�
 - docker-compose
 
 ## 使い方
+好きなディレクトリで
 ```
-git clone
-cd 
-sudo docker-compose up
+git clone git@github.com:190ikp/pm-server.git
+docker-compose up
 ```
 git cloneしたままの状態だと
 - http://localhost/ => Hello Worldなトップページ

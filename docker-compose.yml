@@ -6,12 +6,12 @@ services:
     depends_on:
       - gitbucket
       - redmine
+      - ldapadmin
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./conf/nginx.conf:/etc/nginx/nginx.conf:ro
-      # ログファイル置き場
+      - ./conf//nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./log/nginx:/var/log/nginx
       # indexファイルを ./www に置く
       - ./www:/usr/share/nginx/html:ro
@@ -21,13 +21,15 @@ services:
   gitbucket:
     image: f99aq8ove/gitbucket:latest
     container_name: gitbucket
+    depends_on:
+      - ldap
     ports:
       - "7996:8080"
       # # for SSH access
       - "29148:29418"
     volumes:
-      - ./gitbucket:/gitbucket
-      # リポジトリのディレクトリは ./gitbucket/repositories
+      # リポジトリのディレクトリは ./data/gitbucket/repositories
+      - ./data/gitbucket:/gitbucket
     networks:
       - front
 
@@ -36,11 +38,12 @@ services:
     container_name: redmine
     depends_on:
       - db
+      - ldap
     ports: 
       - "65457:3000"
     volumes:
-      - ./redmine/files:/usr/src/redmine/files
-      - ./redmine/plugins:/usr/src/redmine/plugins
+      - ./data/redmine/files:/usr/src/redmine/files
+      - ./data/redmine/plugins:/usr/src/redmine/plugins
     environment:
       REDMINE_DB_POSTGRES: db
       REDMINE_DB_PORT: 5432
@@ -57,8 +60,7 @@ services:
     image: postgres:11.1-alpine
     container_name: db
     volumes:
-      # - db_data:/var/lib/postgresql/data
-      - ./redmine/db:/var/lib/postgresql/daa
+      - ./data/redmine/db:/var/lib/postgresql/data
     environment:
       LANG: ja_JP.UTF8
       POSTGRES_DB: redmine
@@ -69,28 +71,61 @@ services:
     secrets:
       - db_redmine_password
 
+  # 以下はDocker Securityが使えるように後々拡張するつもり
 
-  # ldap:
-  #   image: osixia/openldap
-  #   ports:
-  #     - "389:389"
-  #   environment:
-  #     LDAP_ORGANISATION: "example"
-  #     LDAP_DOMAIN: "example.com"
-  #     LDAP_ADMIN_PASSWORD: "root"
-  #     LDAP_CONFIG_PASSWORD: "pass"
-        
-  # phpldapadmin:
-  #   image: osixia/phpldapadmin
-  #   ports:
-  #     - "7347:2398"
-  #   environment:
-  #     PHPLDAPADMIN_LDAP_HOSTS: ldap
-  #     PHPLDAPADMIN_HTTPS: "false"
+  ldapadmin:
+    # for more info:  https://github.com/osixia/docker-phpLDAPadmin
+    image: osixia/phpldapadmin:0.7.2
+    container_name: ldapadmin
+    depends_on:
+      - ldap
+    ports:
+      - "7347:2398"
+    # volumes:
+    #   # 設定は./conf/ldap_admin/env.ymlに記述
+    #   - ./conf/ldap_admin/env.yml:/container/environment/01-custom/env.yaml:ro
+    environment:
+      PHPLDAPADMIN_LDAP_HOSTS: ldap
+      # 後々HTTPS有効化する
+      PHPLDAPADMIN_HTTPS: "false"
+      # 以下はデフォルト値
+      # PHPLDAPADMIN_HTTPS_CRT_FILENAME: phpldapadmin.crt
+      # PHPLDAPADMIN_HTTPS_KEY_FILENAME: phpldapadmin.key
+      # PHPLDAPADMIN_HTTPS_CA_CRT_FILENAME: ca.crt
+    networks:
+      - front
+      - back
+
+  ldap:
+    image: osixia/openldap:1.2.3
+    container_name: ldap
+    volumes:
+      - ./data/ldap/db:/var/lib/ldap
+      - ./conf/ldap:/etc/ldap/slapd.d
+    environment:
+      # 以下は適当に書き換えること
+      LDAP_ORGANISATION: "example company"
+      LDAP_DOMAIN: "example.com"
+      LDAP_ADMIN_PASSWORD: "root"
+      LDAP_CONFIG_PASSWORD: "pass"
+    networks:
+      - back
+
+  openldap-backup:
+    image: osixia/openldap-backup:1.2.3
+    container_name: ldap_bk
+    depends_on:
+      - ldap
+    volumes:
+      - ./data/ldap/backup:/data/backup
+    environment:
+      LDAP_BACKUP_CONFIG_CRON_EXP: "0 5 * * *"
+    networks:
+      - back
 
 networks:
-  front:
   # 後々frontのみホストとつながるようにする予定
+  front:
   back:
 
 secrets:
