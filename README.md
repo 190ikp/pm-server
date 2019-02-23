@@ -16,12 +16,12 @@ Nginx、Redmine、Gitbucket、あと必要なその他をそれぞれDockerコ�
 好きなディレクトリで
 ```
 git clone git@github.com:190ikp/pm-server.git
-docker-compose up
+docker-compose up -d
 ```
 git cloneしたままの状態だと
-- http://localhost/ => Hello Worldなトップページ
-- http://task.localhost/  => Redmine (初期アカウント / パスワードはadmin / admin)
-- http://git.localhost/  => Gitbucket (初期アカウント / パスワードはroot /root)
+- example.com => Hello Worldなトップページ
+- redmine.example.com  => Redmine (初期アカウント / パスワードはadmin / admin)
+- git.example.com  => Gitbucket (初期アカウント / パスワードはroot /root)
 
 にアクセスします。
 

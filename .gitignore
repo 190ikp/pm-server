@@ -1,3 +1,7 @@
 data/
 log/
 conf/ldap
+secrets/certs
+.gitignore
+bash/
+conf/ldap_admin/
