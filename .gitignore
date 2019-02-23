@@ -1,7 +1,6 @@
-data
-log
-secrets/certs
-.gitignore
-bash
-conf/ldap_admin
-dockerfiles
+data/
+log/
+secrets/certs/
+bash/
+conf/ldap_admin/
+dockerfiles/
