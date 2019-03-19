@@ -3,9 +3,7 @@
 
 ## 構成
 Nginx、Redmine、Gitbucket、あと必要なその他をそれぞれDockerコンテナで立ち上げています。  
-あとアカウントが１つで済むようにLDAPもコンテナ立ててます。  
-公式イメージ以外は後々Dockerfileを自前で用意するようにするつもり。  
-ドメインとかは適当に変えてください。
+ドメインとかは適当に変えてください。デフォルトでは`NGINX_HOST=example.com`です。
 
 ## 必要なもの
 - git
@@ -13,17 +11,15 @@ Nginx、Redmine、Gitbucket、あと必要なその他をそれぞれDockerコ�
 - docker-compose
 
 ## 使い方
+好きなディレクトリで
 ```
-git clone
-cd 
-sudo docker-compose up
+git clone git@github.com:190ikp/pm-server.git
+docker-compose up -d
 ```
 git cloneしたままの状態だと
-- http://localhost/ => Hello Worldなトップページ
-- http://task.localhost/  => Redmine (初期アカウント / パスワードはadmin / admin)
-- http://git.localhost/  => Gitbucket (初期アカウント / パスワードはroot /root)
-
-にアクセスします。
+- example.com => Hello Worldなトップページ
+- task.example.com  => Redmine (初期アカウント / パスワードはadmin / admin)
+- git.example.com  => Gitbucket (初期アカウント / パスワードはroot /root)
 
 止めたいときは
 ```
@@ -32,7 +28,9 @@ sudo docker-compose down
 きちんと使いたい場合は
 - `secrets/db_redmine_password.txt`
 
-を書き換えてください。
+を書き換えてください。  
+あと、nginx.confの設定が割と適当なのでそのうち直します。
 
 ## そのうち
-LDAPで認証を管理できるようにするつもり。
+- Jenkinsで自動デプロイができるようにする
+- OpenLDAPで認証を管理できるようにするつもり（めんどくさそう）

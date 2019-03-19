@@ -1,3 +1,6 @@
-gitbucket/
+data/
 log/
-redmine/
+secrets/certs/
+bash/
+conf/ldap_admin/
+dockerfiles/
