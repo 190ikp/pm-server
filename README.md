@@ -32,5 +32,4 @@ sudo docker-compose down
 あと、nginx.confの設定が割と適当なのでそのうち直します。
 
 ## そのうち
-- Jenkinsで自動デプロイができるようにする
-- OpenLDAPで認証を管理できるようにするつもり（めんどくさそう）
+- Jenkinsでｺﾞﾆｮｺﾞﾆｮできるようにする
