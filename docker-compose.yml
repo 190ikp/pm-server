@@ -1,7 +1,7 @@
 version: '3.1'
 services:
-  web:
-    image: nginx:mainline-alpine
+  proxy:
+    image: steveltn/https-portal:1.6.0
     restart: always
     depends_on:
       - gitbucket
@@ -10,21 +10,40 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./conf/nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf.template:ro
-      - ./log/nginx:/var/log/nginx
-      # - ./conf/logrotate.d/nginx:/etc/logrotate.d/nginx:ro
-      # - ./secrets/certs:/etc/nginx/certs:ro
-      - ./www/html:/usr/share/www/html:ro
+      - ./log/nginx/proxy:/var/log/nginx
+      - ./www/vhosts:/var/www/vhosts:ro
     environment:
       TZ: Asia/Tokyo
-      NGINX_HOST: example.com
+      DOMAINS: 'example.com, git.example.com -> http://gitbucket:8080, redmine.example.com -> http://redmine:3000'
+      STAGE: 'local'
     networks:
       - front
-    command: >
-      /bin/sh -c
-      "envsubst '$$NGINX_HOST'
-      < /etc/nginx/conf.d/nginx.conf.template > /etc/nginx/nginx.conf
-      && nginx -g 'daemon off;'"
+  
+  # web:
+  #   image: nginx:mainline-alpine
+  #   restart: always
+  #   depends_on:
+  #     - gitbucket
+  #     - redmine
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./conf/nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf.template:ro
+  #     - ./log/nginx:/var/log/nginx
+  #     # - ./conf/logrotate.d/nginx:/etc/logrotate.d/nginx:ro
+  #     # - ./secrets/certs:/etc/nginx/certs:ro
+  #     - ./www/html:/usr/share/www/html:ro
+  #   environment:
+  #     TZ: Asia/Tokyo
+  #     # NGINX_HOST: example.com
+  #   networks:
+  #     - front
+  #   # command: >
+  #   #   /bin/sh -c
+  #   #   "envsubst '$$NGINX_HOST'
+  #   #   < /etc/nginx/conf.d/nginx.conf.template > /etc/nginx/nginx.conf
+  #   #   && nginx -g 'daemon off;'"
   
   gitbucket:
     image: 190ikp/gitbucket:latest
