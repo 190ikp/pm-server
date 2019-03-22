@@ -14,7 +14,8 @@ services:
       - ./www/vhosts:/var/www/vhosts:ro
     environment:
       TZ: Asia/Tokyo
-      DOMAINS: 'example.com, git.example.com -> http://gitbucket:8080, redmine.example.com -> http://redmine:3000'
+      DOMAINS: 'example.com, git.example.com -> http://gitbucket:8080, task.example.com -> http://redmine:3000'
+      FORCE_RENEW: 'true'
       STAGE: 'local'
     networks:
       - front
